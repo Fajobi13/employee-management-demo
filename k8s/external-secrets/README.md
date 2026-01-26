@@ -18,34 +18,46 @@ Each application has its own Vault path for least-privilege access:
 | Backend | `secret/data/employee-app/backend` | `mysql-username`, `mysql-password` |
 | Reports | `secret/data/employee-app/reports` | `mysql-username`, `mysql-password` |
 
-## Vault Kubernetes Auth Configuration
+## Vault Authentication for ESO
+
+ESO authenticates to Vault via ClusterSecretStore (not via app ServiceAccounts).
 
 ```bash
 # Enable Kubernetes auth
 vault auth enable kubernetes
 
-# Configure Kubernetes auth (adjust API server URL)
+# Configure Kubernetes auth
 vault write auth/kubernetes/config \
   kubernetes_host="https://kubernetes.default.svc"
 
-# Create roles for each ServiceAccount
-vault write auth/kubernetes/role/backend-role \
-  bound_service_account_names=backend-sa \
-  bound_service_account_namespaces=employee-app-backend \
+# Create role for ESO controller ServiceAccount
+vault write auth/kubernetes/role/external-secrets-role \
+  bound_service_account_names=external-secrets \
+  bound_service_account_namespaces=external-secrets \
   policies=employee-app-policy \
   ttl=1h
+```
 
-vault write auth/kubernetes/role/mysql-role \
-  bound_service_account_names=mysql-sa \
-  bound_service_account_namespaces=employee-app-db \
-  policies=employee-app-policy \
-  ttl=1h
+Example ClusterSecretStore:
 
-vault write auth/kubernetes/role/reports-role \
-  bound_service_account_names=reports-sa \
-  bound_service_account_namespaces=employee-app-backend \
-  policies=employee-app-policy \
-  ttl=1h
+```yaml
+apiVersion: external-secrets.io/v1beta1
+kind: ClusterSecretStore
+metadata:
+  name: vault-backend
+spec:
+  provider:
+    vault:
+      server: "http://vault.vault.svc:8200"
+      path: "secret"
+      version: "v2"
+      auth:
+        kubernetes:
+          mountPath: "kubernetes"
+          role: "external-secrets-role"
+          serviceAccountRef:
+            name: "external-secrets"
+            namespace: "external-secrets"
 ```
 
 ## Setup Vault Secrets
