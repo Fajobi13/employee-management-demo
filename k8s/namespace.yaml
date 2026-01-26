@@ -1,6 +1,35 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: employee-app
+  name: employee-app-frontend
   labels:
     app: employee-management
+    tier: frontend
+    owner: platform-team
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: employee-app-backend
+  labels:
+    app: employee-management
+    tier: backend
+    owner: platform-team
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: employee-app-db
+  labels:
+    app: employee-management
+    tier: database
+    owner: platform-team
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted

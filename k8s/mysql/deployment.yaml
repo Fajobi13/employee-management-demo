@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
-  namespace: employee-app
+  namespace: employee-app-db
   labels:
     app: mysql
 spec:
@@ -17,12 +17,26 @@ spec:
       labels:
         app: mysql
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: mysql
-          image: mysql:8.0
+          image: mysql:8.0.36
           ports:
             - containerPort: 3306
               name: mysql
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:

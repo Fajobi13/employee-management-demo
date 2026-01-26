@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mysql
-  namespace: employee-app
+  namespace: employee-app-db
   labels:
     app: mysql
 spec:

@@ -2,8 +2,8 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: backend-config
-  namespace: employee-app
+  namespace: employee-app-backend
 data:
-  MYSQL_HOST: mysql
+  MYSQL_HOST: mysql.employee-app-db.svc.cluster.local
   MYSQL_PORT: "3306"
   MYSQL_DATABASE: employeedb
