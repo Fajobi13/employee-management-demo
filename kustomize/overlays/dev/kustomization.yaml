@@ -1,0 +1,35 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../k8s
+
+namePrefix: dev-
+
+labels:
+  - pairs:
+      environment: dev
+    includeSelectors: false
+
+# Reduce replicas for dev
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: backend
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: frontend
+
+# Dev-specific config
+configMapGenerator:
+  - name: dev-config
+    literals:
+      - LOG_LEVEL=DEBUG

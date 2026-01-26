@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../k8s
+  # ESO enabled in prod (local copies)
+  - mysql-external-secret.yaml
+  - backend-external-secret.yaml
+  - reports-external-secret.yaml
+
+namePrefix: prod-
+
+labels:
+  - pairs:
+      environment: prod
+    includeSelectors: false
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+    target:
+      kind: Deployment
+      name: backend
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+    target:
+      kind: Deployment
+      name: frontend
+  # Remove static secrets in prod (ESO creates them)
+  - path: delete-static-secrets.yaml
+
+configMapGenerator:
+  - name: prod-config
+    literals:
+      - LOG_LEVEL=WARN

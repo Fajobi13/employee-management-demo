@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # Namespaces
+  - namespace.yaml
+
+  # Frontend
+  - frontend/deployment.yaml
+  - frontend/service.yaml
+
+  # Backend
+  - backend/deployment.yaml
+  - backend/service.yaml
+  - backend/configmap.yaml
+  - backend/secret.yaml
+  - backend/rbac.yaml
+
+  # Reports
+  - reports/deployment.yaml
+  - reports/service.yaml
+  - reports/secret.yaml
+  - reports/rbac.yaml
+  - reports/servicemonitor.yaml
+
+  # MySQL
+  - mysql/deployment.yaml
+  - mysql/service.yaml
+  - mysql/secret.yaml
+  - mysql/pvc.yaml
+  - mysql/init-configmap.yaml
+  - mysql/rbac.yaml
+
+  # Network Policies
+  - network-policies.yaml
+
+  # Ingress
+  - ingress.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/managed-by: kustomize
+    includeSelectors: false
