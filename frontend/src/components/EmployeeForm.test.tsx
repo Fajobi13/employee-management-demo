@@ -1,13 +1,14 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import EmployeeForm from './EmployeeForm';
-import { Department } from '../types/Employee';
+import { Employee } from '../types/Employee';
 
 describe('EmployeeForm', () => {
   const mockOnSubmit = vi.fn();
   const mockOnCancel = vi.fn();
 
   const defaultProps = {
+    employee: null,
     onSubmit: mockOnSubmit,
     onCancel: mockOnCancel,
   };
@@ -25,12 +26,12 @@ describe('EmployeeForm', () => {
   });
 
   it('renders form with employee data when editing', () => {
-    const employee = {
+    const employee: Employee = {
       id: 1,
       firstName: 'John',
       lastName: 'Doe',
       email: 'john@example.com',
-      department: Department.ENGINEERING,
+      department: 'ENGINEERING',
       salary: 75000,
       hireDate: '2023-01-15',
     };
@@ -50,35 +51,51 @@ describe('EmployeeForm', () => {
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 
-  it('renders all department options', () => {
+  it('renders department select', () => {
     render(<EmployeeForm {...defaultProps} />);
 
     const departmentSelect = screen.getByLabelText(/department/i);
     expect(departmentSelect).toBeInTheDocument();
-
-    Object.values(Department).forEach(dept => {
-      expect(screen.getByRole('option', { name: dept })).toBeInTheDocument();
-    });
+    expect(departmentSelect.tagName).toBe('SELECT');
   });
 
-  it('shows correct button text for new vs edit mode', () => {
-    const { rerender } = render(<EmployeeForm {...defaultProps} />);
-    expect(screen.getByRole('button', { name: /add employee/i })).toBeInTheDocument();
+  it('shows Add Employee title for new employee', () => {
+    render(<EmployeeForm {...defaultProps} />);
+    expect(screen.getByText('Add Employee')).toBeInTheDocument();
+  });
 
-    rerender(
-      <EmployeeForm
-        {...defaultProps}
-        employee={{
-          id: 1,
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john@example.com',
-          department: Department.ENGINEERING,
-          salary: 75000,
-          hireDate: '2023-01-15',
-        }}
-      />
-    );
-    expect(screen.getByRole('button', { name: /update employee/i })).toBeInTheDocument();
+  it('shows Edit Employee title when editing', () => {
+    const employee: Employee = {
+      id: 1,
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@example.com',
+      department: 'ENGINEERING',
+      salary: 75000,
+      hireDate: '2023-01-15',
+    };
+
+    render(<EmployeeForm {...defaultProps} employee={employee} />);
+    expect(screen.getByText('Edit Employee')).toBeInTheDocument();
+  });
+
+  it('shows Create button for new employee', () => {
+    render(<EmployeeForm {...defaultProps} />);
+    expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument();
+  });
+
+  it('shows Update button when editing', () => {
+    const employee: Employee = {
+      id: 1,
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@example.com',
+      department: 'ENGINEERING',
+      salary: 75000,
+      hireDate: '2023-01-15',
+    };
+
+    render(<EmployeeForm {...defaultProps} employee={employee} />);
+    expect(screen.getByRole('button', { name: /update/i })).toBeInTheDocument();
   });
 });

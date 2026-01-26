@@ -7,11 +7,11 @@ COPY src ./src
 RUN mvn clean package -DskipTests -B
 
 # Runtime stage
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+RUN groupadd -g 1001 appgroup && \
+    useradd -u 1001 -g appgroup appuser
 
 COPY --from=build /app/target/*.jar app.jar
 
@@ -21,6 +21,6 @@ USER appuser
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+    CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
