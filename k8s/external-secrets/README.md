@@ -18,6 +18,36 @@ Each application has its own Vault path for least-privilege access:
 | Backend | `secret/data/employee-app/backend` | `mysql-username`, `mysql-password` |
 | Reports | `secret/data/employee-app/reports` | `mysql-username`, `mysql-password` |
 
+## Vault Kubernetes Auth Configuration
+
+```bash
+# Enable Kubernetes auth
+vault auth enable kubernetes
+
+# Configure Kubernetes auth (adjust API server URL)
+vault write auth/kubernetes/config \
+  kubernetes_host="https://kubernetes.default.svc"
+
+# Create roles for each ServiceAccount
+vault write auth/kubernetes/role/backend-role \
+  bound_service_account_names=backend-sa \
+  bound_service_account_namespaces=employee-app-backend \
+  policies=employee-app-policy \
+  ttl=1h
+
+vault write auth/kubernetes/role/mysql-role \
+  bound_service_account_names=mysql-sa \
+  bound_service_account_namespaces=employee-app-db \
+  policies=employee-app-policy \
+  ttl=1h
+
+vault write auth/kubernetes/role/reports-role \
+  bound_service_account_names=reports-sa \
+  bound_service_account_namespaces=employee-app-backend \
+  policies=employee-app-policy \
+  ttl=1h
+```
+
 ## Setup Vault Secrets
 
 ```bash
@@ -37,6 +67,17 @@ vault kv put secret/employee-app/backend \
 vault kv put secret/employee-app/reports \
   mysql-username="reports_reader" \
   mysql-password="reportspass"
+```
+
+## Vault Policy
+
+```bash
+# Create policy for employee-app secrets
+vault policy write employee-app-policy - <<EOF
+path "secret/data/employee-app/*" {
+  capabilities = ["read"]
+}
+EOF
 ```
 
 ## Deployment
