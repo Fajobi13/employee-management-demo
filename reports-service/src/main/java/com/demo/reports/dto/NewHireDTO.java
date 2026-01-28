@@ -11,8 +11,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class NewHireDTO {
     private Long id;
-    private String fullName;
+    private String firstName;
+    private String lastName;
     private String email;
     private String department;
     private LocalDate hireDate;
+    private long daysSinceHire;
 }

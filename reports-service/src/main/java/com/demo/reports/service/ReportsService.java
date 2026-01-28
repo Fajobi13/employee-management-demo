@@ -152,12 +152,22 @@ public class ReportsService {
     }
 
     private NewHireDTO toNewHireDTO(Employee employee) {
+        long daysSinceHire = java.time.temporal.ChronoUnit.DAYS.between(employee.getHireDate(), LocalDate.now());
         return new NewHireDTO(
                 employee.getId(),
-                employee.getFirstName() + " " + employee.getLastName(),
+                capitalize(employee.getFirstName()),
+                capitalize(employee.getLastName()),
                 employee.getEmail(),
                 employee.getDepartment().name(),
-                employee.getHireDate()
+                employee.getHireDate(),
+                daysSinceHire
         );
+    }
+
+    private String capitalize(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 }
