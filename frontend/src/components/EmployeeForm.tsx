@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Employee, Department, DEPARTMENTS, formatDepartment } from '../types/Employee';
 
 interface EmployeeFormProps {
@@ -9,28 +9,15 @@ interface EmployeeFormProps {
 
 function EmployeeForm({ employee, onSubmit, onCancel }: EmployeeFormProps) {
   const [formData, setFormData] = useState<Omit<Employee, 'id'>>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    department: 'ENGINEERING',
-    salary: 0,
-    hireDate: new Date().toISOString().split('T')[0],
+    firstName: employee?.firstName ?? '',
+    lastName: employee?.lastName ?? '',
+    email: employee?.email ?? '',
+    department: employee?.department ?? 'ENGINEERING',
+    salary: employee?.salary ?? 0,
+    hireDate: employee?.hireDate ?? new Date().toISOString().split('T')[0],
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    if (employee) {
-      setFormData({
-        firstName: employee.firstName,
-        lastName: employee.lastName,
-        email: employee.email,
-        department: employee.department,
-        salary: employee.salary,
-        hireDate: employee.hireDate,
-      });
-    }
-  }, [employee]);
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
