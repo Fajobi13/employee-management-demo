@@ -15,6 +15,7 @@ vi.mock('axios', () => ({
 describe('API Service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.resetModules();
   });
 
   it('creates axios instance with correct config', async () => {
