@@ -35,7 +35,8 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
-            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
@@ -65,6 +66,10 @@ spec:
               mountPath: /var/lib/mysql
             - name: mysql-init
               mountPath: /docker-entrypoint-initdb.d
+            - name: tmp
+              mountPath: /tmp
+            - name: mysql-run
+              mountPath: /var/run/mysqld
           resources:
             requests:
               memory: "256Mi"
@@ -99,3 +104,7 @@ spec:
         - name: mysql-init
           configMap:
             name: mysql-init
+        - name: tmp
+          emptyDir: {}
+        - name: mysql-run
+          emptyDir: {}
