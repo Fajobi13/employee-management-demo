@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    environment {
+        POLICY_REGISTRY = 'ghcr.io/fajobi13/employee-management-demo/policies'
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timestamps()
+    }
+
+    stages {
+        stage('Verify Policies') {
+            steps {
+                sh 'conftest verify --policy policy/kubernetes'
+                sh 'conftest verify --policy policy/dockerfile'
+            }
+        }
+
+        stage('Push Policies') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'ghcr-credentials',
+                    usernameVariable: 'REGISTRY_USER',
+                    passwordVariable: 'REGISTRY_PASS'
+                )]) {
+                    sh 'echo $REGISTRY_PASS | docker login ghcr.io -u $REGISTRY_USER --password-stdin'
+                    sh "conftest push ${POLICY_REGISTRY}:latest --policy policy/kubernetes --policy policy/dockerfile"
+                    sh "conftest push ${POLICY_REGISTRY}:${env.GIT_COMMIT.take(7)} --policy policy/kubernetes --policy policy/dockerfile"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker logout ghcr.io || true'
+            cleanWs()
+        }
+        failure {
+            echo "Policy pipeline failed on branch: ${env.BRANCH_NAME}"
+        }
+    }
+}
