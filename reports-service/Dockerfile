@@ -11,19 +11,13 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn package -DskipTests -B
 
-# Runtime stage - Alpine-based JRE with security updates
-FROM eclipse-temurin:21-jre-alpine
-
-# Apply security patches and create non-root user
-RUN apk upgrade --no-cache && \
-    addgroup -g 1000 appgroup && \
-    adduser -u 1000 -G appgroup -D appuser
+# Runtime stage - Distroless for minimal attack surface (no shell, no pkg manager)
+# Eliminates Alpine zlib and libexpat CVEs by using patched Debian 12 base
+FROM gcr.io/distroless/java21-debian12:nonroot
 
 WORKDIR /app
 
 COPY --from=build /app/target/reports-service-1.0.0.jar app.jar
-
-USER appuser
 
 EXPOSE 8081
 

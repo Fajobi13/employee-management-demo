@@ -7,10 +7,11 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:1.27-alpine
+FROM nginx:1.27-alpine3.21
 
-# Apply security patches and prepare for non-root nginx
+# Apply security patches for critical CVEs (libexpat, libxml2, openssl)
 RUN apk upgrade --no-cache && \
+    apk add --no-cache --upgrade libexpat libxml2 openssl && \
     sed -i 's|/run/nginx.pid|/tmp/nginx.pid|' /etc/nginx/nginx.conf && \
     chown -R nginx:nginx /var/cache/nginx /var/log/nginx /etc/nginx/conf.d && \
     touch /tmp/nginx.pid && chown nginx:nginx /tmp/nginx.pid
