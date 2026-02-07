@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:1.27-alpine3.21
+FROM nginx:1.28-alpine3.21
 
 # Apply security patches for critical CVEs (libexpat, libxml2, openssl)
 RUN apk upgrade --no-cache && \
