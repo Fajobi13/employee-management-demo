@@ -6,9 +6,8 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn clean package -DskipTests -B
 
-# Runtime stage - Distroless for minimal attack surface (no shell, no pkg manager)
-# Eliminates Alpine zlib and libexpat CVEs by using patched Debian 12 base
-FROM gcr.io/distroless/java21-debian12:nonroot
+# Runtime stage - Chainguard JRE for zero known CVEs (Wolfi-based, no shell)
+FROM cgr.dev/chainguard/jre:latest
 
 WORKDIR /app
 
