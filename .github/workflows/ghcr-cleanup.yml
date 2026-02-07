@@ -1,0 +1,50 @@
+name: GHCR Cleanup
+
+on:
+  schedule:
+    - cron: "0 3 * * 0" # Every Sunday at 3 AM UTC
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  packages: write
+
+jobs:
+  cleanup:
+    name: "Cleanup ${{ matrix.package }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - employee-management-demo/frontend
+          - employee-management-demo/backend
+          - employee-management-demo/reports-service
+    steps:
+      # 1. Keep last 20 tagged versions, delete the rest
+      - name: Delete old tagged versions (keep last 20)
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: ${{ matrix.package }}
+          package-type: container
+          min-versions-to-keep: 20
+          ignore-versions: "^(v\\d+\\.\\d+\\.\\d+|release-|prod-|latest).*"
+
+      # 2. Delete all untagged (dangling) images
+      - name: Delete untagged images
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: ${{ matrix.package }}
+          package-type: container
+          delete-only-untagged-versions: true
+          min-versions-to-keep: 0
+
+      # 3. Delete PR images older than 7 days
+      - name: Delete old PR images
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: ${{ matrix.package }}
+          package-type: container
+          min-versions-to-keep: 0
+          ignore-versions: "^(?!pr-).*"
+          delete-only-pre-release-versions: false
+          token: ${{ secrets.GITHUB_TOKEN }}

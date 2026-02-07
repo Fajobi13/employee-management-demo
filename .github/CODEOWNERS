@@ -1,0 +1,6 @@
+# Require admin approval for all CI/CD and security workflow changes
+/.github/workflows/ @Fajobi13
+/.github/dependabot.yml @Fajobi13
+
+# Require admin approval for policy changes
+/policy/ @Fajobi13

@@ -18,7 +18,7 @@ WORKDIR /app
 
 COPY --from=build /app/target/reports-service-1.0.0.jar app.jar
 
-USER nonroot
+USER 65532
 
 EXPOSE 8081
 

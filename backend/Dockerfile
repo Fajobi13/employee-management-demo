@@ -13,7 +13,7 @@ WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
 
-USER nonroot
+USER 65532
 
 EXPOSE 8080
 
