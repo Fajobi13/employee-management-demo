@@ -11,13 +11,14 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn package -DskipTests -B
 
-# Runtime stage
-FROM gcr.io/distroless/java21-debian12:nonroot
+# Runtime stage - Chainguard JRE for zero known CVEs (Wolfi-based, no shell)
+FROM cgr.dev/chainguard/jre:latest
+
 WORKDIR /app
 
 COPY --from=build /app/target/reports-service-1.0.0.jar app.jar
 
-USER nonroot
+USER 65532
 
 EXPOSE 8081
 

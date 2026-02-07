@@ -29,6 +29,28 @@ updates:
       day: monday
     open-pull-requests-limit: 10
 
+  # Docker base images
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: docker
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: docker
+    directory: /reports-service
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+
   # GitHub Actions
   - package-ecosystem: github-actions
     directory: /

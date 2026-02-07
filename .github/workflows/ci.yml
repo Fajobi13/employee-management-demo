@@ -58,13 +58,13 @@ jobs:
         include:
           - service: frontend
             path: frontend
-            image_name: ghcr.io/fajobi13/employee-management-demo/frontend
+            image_name: ghcr.io/securedbyfajobi/employee-management-demo/frontend
           - service: backend
             path: backend
-            image_name: ghcr.io/fajobi13/employee-management-demo/backend
+            image_name: ghcr.io/securedbyfajobi/employee-management-demo/backend
           - service: reports-service
             path: reports-service
-            image_name: ghcr.io/fajobi13/employee-management-demo/reports-service
+            image_name: ghcr.io/securedbyfajobi/employee-management-demo/reports-service
     uses: ./.github/workflows/_docker-build-push.yml
     with:
       service: ${{ matrix.service }}

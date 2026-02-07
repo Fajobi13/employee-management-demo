@@ -39,7 +39,14 @@ deny contains msg if {
 	instruction.Cmd == "from"
 	val := instruction.Value[0]
 	endswith(val, ":latest")
+	not is_chainguard_image(val)
 	msg := sprintf("Base image '%s' must not use the 'latest' tag", [val])
+}
+
+# Chainguard images only offer :latest on the free tier and are
+# continuously rebuilt to target zero known CVEs, so :latest is acceptable.
+is_chainguard_image(val) if {
+	startswith(val, "cgr.dev/chainguard/")
 }
 
 # Dockerfile must use multi-stage build
